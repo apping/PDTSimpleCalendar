@@ -9,11 +9,13 @@
 #import "PDTSimpleCalendarViewCell.h"
 
 const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
+const CGFloat PDTSimpleCalendarIndicatorCircleSize = 5.0f;
 
 @interface PDTSimpleCalendarViewCell ()
 
 @property (nonatomic, strong) UILabel *dayLabel;
 @property (nonatomic, strong) NSDate *date;
+@property (nonatomic, strong) UIView *indicatorDot;
 
 @end
 
@@ -46,23 +48,40 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     if (self) {
         _date = nil;
         _isToday = NO;
+        
+        // Add the dayLabel
         _dayLabel = [[UILabel alloc] init];
         [self.dayLabel setFont:[self textDefaultFont]];
         [self.dayLabel setTextAlignment:NSTextAlignmentCenter];
         [self.contentView addSubview:self.dayLabel];
-
+        
         //Add the Constraints
         [self.dayLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.dayLabel setBackgroundColor:[UIColor clearColor]];
         self.dayLabel.layer.cornerRadius = PDTSimpleCalendarCircleSize/2;
         self.dayLabel.layer.masksToBounds = YES;
-
+        
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.dayLabel attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.dayLabel attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0]];
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.dayLabel attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:PDTSimpleCalendarCircleSize]];
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.dayLabel attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:PDTSimpleCalendarCircleSize]];
+        
+        // Add the indicatorDot
+        self.indicatorDot = [[UIView alloc] init];
+        [self.indicatorDot setBackgroundColor:[UIColor clearColor]];
+        [self.indicatorDot setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [self.indicatorDot.layer setCornerRadius:(PDTSimpleCalendarIndicatorCircleSize/2)];
+        [self.indicatorDot setHidden:YES];
+        [self.contentView addSubview:self.indicatorDot];
+
+        // Add the Constraints
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.indicatorDot attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.indicatorDot attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:12.0]];
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.indicatorDot attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:PDTSimpleCalendarIndicatorCircleSize]];
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.indicatorDot attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:PDTSimpleCalendarIndicatorCircleSize]];
 
         [self setCircleColor:NO selected:NO];
+        [self setIndicatorColor:NO selected:NO];
     }
 
     return self;
@@ -82,12 +101,14 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
 {
     _isToday = isToday;
     [self setCircleColor:isToday selected:self.selected];
+    [self setIndicatorColor:isToday selected:self.selected];
 }
 
 - (void)setSelected:(BOOL)selected
 {
     [super setSelected:selected];
     [self setCircleColor:self.isToday selected:selected];
+    [self setIndicatorColor:self.isToday selected:self.selected];
 }
 
 
@@ -119,9 +140,38 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
 }
 
 
+- (void)setIndicatorColor:(BOOL)today selected:(BOOL)selected
+{
+    UIColor *indicatorColor = (today) ? [self activityIndicatorTodayColor] : [self activityIndicatorDefaultColor];
+    
+    if (self.date && self.delegate) {
+        if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:shouldDisplayActivityDotForDate:)] && [self.delegate simpleCalendarViewCell:self shouldDisplayActivityDotForDate:self.date]) {
+            
+            if ([self.delegate respondsToSelector:@selector(simpleCalendarViewCell:activityColorForDate:)] && [self.delegate simpleCalendarViewCell:self activityColorForDate:self.date]) {
+                indicatorColor = [self.delegate simpleCalendarViewCell:self activityColorForDate:self.date];
+            }
+            else {
+                indicatorColor = [self activityIndicatorDefaultColor];
+            }
+            [self.indicatorDot setHidden:NO];
+        }
+        else {
+            [self.indicatorDot setHidden:YES];
+        }
+    }
+    
+    if (selected) {
+        indicatorColor = [self activityIndicatorSelectedColor];
+    }
+    
+    [self.indicatorDot setBackgroundColor:indicatorColor];
+}
+
+
 - (void)refreshCellColors
 {
     [self setCircleColor:self.isToday selected:self.isSelected];
+    [self setIndicatorColor:self.isToday selected:self.isSelected];
 }
 
 
@@ -135,9 +185,49 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     [self.dayLabel setText:@""];
     [self.dayLabel setBackgroundColor:[self circleDefaultColor]];
     [self.dayLabel setTextColor:[self textDefaultColor]];
+    [self.indicatorDot setHidden:YES];
 }
 
 #pragma mark - Circle Color Customization Methods
+
+- (UIColor *)activityIndicatorDefaultColor
+{
+    if(_activityIndicatorDefaultColor == nil) {
+        _activityIndicatorDefaultColor = [[[self class] appearance] activityIndicatorDefaultColor];
+    }
+    
+    if(_activityIndicatorDefaultColor != nil) {
+        return _activityIndicatorDefaultColor;
+    }
+    
+    return [UIColor darkGrayColor];
+}
+
+- (UIColor *)activityIndicatorSelectedColor
+{
+    if(_activityIndicatorSelectedColor == nil) {
+        _activityIndicatorSelectedColor = [[[self class] appearance] activityIndicatorSelectedColor];
+    }
+    
+    if(_activityIndicatorSelectedColor != nil) {
+        return _activityIndicatorSelectedColor;
+    }
+    
+    return [UIColor darkGrayColor];
+}
+
+- (UIColor *)activityIndicatorTodayColor
+{
+    if(_activityIndicatorTodayColor == nil) {
+        _activityIndicatorTodayColor = [[[self class] appearance] activityIndicatorTodayColor];
+    }
+    
+    if(_activityIndicatorTodayColor != nil) {
+        return _activityIndicatorTodayColor;
+    }
+    
+    return [UIColor whiteColor];
+}
 
 - (UIColor *)circleDefaultColor
 {

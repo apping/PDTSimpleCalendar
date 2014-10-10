@@ -216,7 +216,7 @@
 			name = PDTSimpleCalendarDemoTests;
 			productName = PDTSimpleCalendarDemoTests;
 			productReference = 8971B47F18CEB0D600736D3B /* PDTSimpleCalendarDemoTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -225,7 +225,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = PDT;
-				LastTestingUpgradeCheck = 0510;
+				LastTestingUpgradeCheck = 0600;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = Producteev;
 				TargetAttributes = {

@@ -143,4 +143,15 @@
     return [UIColor orangeColor];
 }
 
+- (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller activityColorForDate:(NSDate *)date
+{
+    return [UIColor blueColor];
+}
+
+- (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller shouldDisplayActivityDotForDate:(NSDate *)date
+{
+    NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay fromDate:date];
+    return [components day] % 2;
+}
+
 @end
