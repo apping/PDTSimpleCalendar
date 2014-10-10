@@ -47,6 +47,27 @@
  */
 - (UIColor *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell circleColorForDate:(NSDate *)date;
 
+/**
+ *  Asks the delegate if the Calendar should use display a dot for a given date indicating a day with an event.
+ *
+ *  @param controller the calendarView Controller
+ *  @param date       the date (Midnight GMT)
+ *
+ *  @return YES if the calendar should display an activity dot for the given date
+ */
+- (BOOL)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell shouldDisplayActivityDotForDate:(NSDate *)date;
+
+/**
+ *  Asks the delegate for the color of the activity indicator for a specific date.
+ *  Will be called only if the delegate returns YES for `- (BOOL)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell shouldDisplayActivityDotForDate:(NSDate *)date;`
+ *
+ *  @param controller the calendarView Controller
+ *  @param date       the date (Midnight GMT)
+ *
+ *  @return The desired color of the indicator
+ */
+- (UIColor *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell activityColorForDate:(NSDate *)date;
+
 @end
 
 /**
@@ -66,6 +87,21 @@
  *  Define if the cell is today in the calendar.
  */
 @property (nonatomic, assign) BOOL isToday;
+
+/**
+ *  Customize default indicator color for a date using UIAppearance.
+ */
+@property (nonatomic, strong) UIColor *activityIndicatorDefaultColor UI_APPEARANCE_SELECTOR;
+
+/**
+ *  Customize the indicator color for a selected date using UIAppearance.
+ */
+@property (nonatomic, strong) UIColor *activityIndicatorSelectedColor UI_APPEARANCE_SELECTOR;
+
+/**
+ *  Customize the indicator color for a selected date using UIAppearance.
+ */
+@property (nonatomic, strong) UIColor *activityIndicatorTodayColor UI_APPEARANCE_SELECTOR;
 
 /**
  *  Customize the circle behind the day's number color using UIAppearance.

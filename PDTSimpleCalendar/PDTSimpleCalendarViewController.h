@@ -154,4 +154,25 @@
  */
 - (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller textColorForDate:(NSDate *)date;
 
+/**
+ *  Asks the delegate if the Calendar should use display a dot for a given date indicating a day with an event.
+ *
+ *  @param controller the calendarView Controller
+ *  @param date       the date (Midnight GMT)
+ *
+ *  @return YES if the calendar should display an activity dot for the given date
+ */
+- (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller shouldDisplayActivityDotForDate:(NSDate *)date;
+
+/**
+ *  Asks the delegate for the color of the activity indicator for a specific date.
+ *  Will be called only if the delegate returns YES for `- (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller shouldDisplayActivityDotForDate:(NSDate *)date;`
+ *
+ *  @param controller the calendarView Controller
+ *  @param date       the date (Midnight GMT)
+ *
+ *  @return The desired color of the indicator
+ */
+- (UIColor *)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller activityColorForDate:(NSDate *)date;
+
 @end;

@@ -370,7 +370,8 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
     BOOL isToday = NO;
     BOOL isSelected = NO;
-    BOOL isCustomDate = NO;
+    BOOL shouldUseCustomColor = NO;
+    BOOL shouldDisplayActivity = NO;
 
     if (cellDateComponents.month == firstOfMonthsComponents.month) {
         isSelected = ([self isSelectedDate:cellDate] && (indexPath.section == [self sectionForDate:cellDate]));
@@ -379,7 +380,12 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 
         //Ask the delegate if this date should have specific colors.
         if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:shouldUseCustomColorsForDate:)]) {
-            isCustomDate = [self.delegate simpleCalendarViewController:self shouldUseCustomColorsForDate:cellDate];
+            shouldUseCustomColor = [self.delegate simpleCalendarViewController:self shouldUseCustomColorsForDate:cellDate];
+        }
+        
+        //Ask the delegate if this date should have specific colors.
+        if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:shouldDisplayActivityDotForDate:)]) {
+            shouldDisplayActivity = [self.delegate simpleCalendarViewController:self shouldDisplayActivityDotForDate:cellDate];
         }
 
 
@@ -396,7 +402,7 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     }
 
     //If the current Date is not enabled, or if the delegate explicitely specify custom colors
-    if (![self isEnabledDate:cellDate] || isCustomDate) {
+    if (![self isEnabledDate:cellDate] || shouldUseCustomColor || shouldDisplayActivity) {
         [cell refreshCellColors];
     }
 
@@ -637,5 +643,34 @@ static const NSInteger kFirstDay = 1;
 
     return nil;
 }
+
+- (BOOL)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell shouldDisplayActivityDotForDate:(NSDate *)date
+{
+    //If the date is not enabled (aka outside the first/lastDate) return YES
+    if (![self isEnabledDate:date]) {
+        return NO;
+    }
+    
+    //Otherwise we ask the delegate
+    if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:shouldDisplayActivityDotForDate:)]) {
+        return [self.delegate simpleCalendarViewController:self shouldDisplayActivityDotForDate:date];
+    }
+    
+    return NO;
+}
+
+- (UIColor *)simpleCalendarViewCell:(PDTSimpleCalendarViewCell *)cell activityColorForDate:(NSDate *)date
+{
+    if (![self isEnabledDate:date]) {
+        return cell.activityIndicatorDefaultColor;
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:activityColorForDate:)]) {
+        return [self.delegate simpleCalendarViewController:self activityColorForDate:date];
+    }
+    
+    return nil;
+}
+
 
 @end
