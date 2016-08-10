@@ -99,6 +99,10 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
     if (self.selectedDate) {
         [self.collectionViewLayout invalidateLayout];
     }
+    
+    if (self.initialDate) {
+        [self scrollToDate:self.initialDate animated:false];
+    }
 }
 
 #pragma mark - Accessors
@@ -269,6 +273,8 @@ static const NSCalendarUnit kCalendarUnitYMD = NSCalendarUnitYear | NSCalendarUn
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    
 
     //Configure the Collection View
     [self.collectionView registerClass:[PDTSimpleCalendarViewCell class] forCellWithReuseIdentifier:PDTSimpleCalendarViewCellIdentifier];

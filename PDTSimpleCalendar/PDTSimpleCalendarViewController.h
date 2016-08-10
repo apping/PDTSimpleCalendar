@@ -45,6 +45,11 @@
  */
 @property (nonatomic, strong) NSDate *selectedDate;
 
+/**
+ *  The date to scroll to
+ */
+@property (nonatomic, strong) NSDate *initialDate;
+
 /** @name Customizing Appearance */
 
 /**
