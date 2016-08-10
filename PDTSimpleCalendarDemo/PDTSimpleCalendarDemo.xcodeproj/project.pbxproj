@@ -159,6 +159,7 @@
 				CLASSPREFIX = PDT;
 				LastTestingUpgradeCheck = 0610;
 				LastUpgradeCheck = 0610;
+
 				ORGANIZATIONNAME = Producteev;
 			};
 			buildConfigurationList = 8959430C180CB350007DEC5D /* Build configuration list for PBXProject "PDTSimpleCalendarDemo" */;
